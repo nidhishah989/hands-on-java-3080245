@@ -17,7 +17,7 @@ public class DataSource {
 
     try {
       conn = DriverManager.getConnection(sql_DB);
-      System.out.println("SQLite connection has established.");
+      // System.out.println("SQLite connection has established.");
 
     } catch (SQLException e) {
       // normal print message about exception
@@ -87,10 +87,17 @@ public class DataSource {
     return accresult;
   }
 
-  public static void main(String[] args) {
-    Customer cust = getCustomer("ttoulchi5@ehow.com");
-    System.out.println(cust.getName());
-    Account custacc = getaccountinfo(cust.getAccountId());
-    System.out.println(custacc.getBalance());
+  // update bank balance
+  public static void updateBalance(int accountid, double newbalance) {
+    String sqlstm = "update Accounts set balance=? where id=?";
+    try (Connection conn = connect();
+        PreparedStatement stm = conn.prepareStatement(sqlstm);) {
+      stm.setDouble(1, newbalance);
+      stm.setInt(2, accountid);
+      stm.executeUpdate();
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
   }
+
 }

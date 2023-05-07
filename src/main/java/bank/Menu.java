@@ -4,6 +4,9 @@ import java.util.Scanner;
 
 import javax.security.auth.login.LoginException;
 
+import bank.exception.AmountException;
+import bank.exception.MinimumBalanceException;
+
 public class Menu {
   private Scanner scanner;
 
@@ -42,12 +45,24 @@ public class Menu {
           System.out.println("How much would you like to deposit? ");
           amount = scanner.nextDouble();
           // deposit amount
-          Account.deposit(amount);
+          try {
+            userinfo.deposit(amount);
+            System.out.println("New Balance: " + userinfo.getBalance());
+          } catch (AmountException e) {
+            System.out.println("Error: " + e.getMessage());
+            System.out.println("Try Again.");
+          }
           break;
         case 2:
           System.out.println("How much would you like to withdraw?");
           amount = scanner.nextDouble();
-          Account.withdraw(amount);
+          try {
+            userinfo.withdraw(amount);
+            System.out.println("New Balance: " + userinfo.getBalance());
+          } catch (MinimumBalanceException e) {
+            System.out.println("Error: " + e.getMessage());
+            System.out.println("Try Again.");
+          }
           break;
         case 3:
           System.out.println("Current Balance: " + userinfo.getBalance());
@@ -65,6 +80,7 @@ public class Menu {
   }
 
   public static void main(String[] args) {
+
     System.out.println("Welcome to bank system.");
     Menu menu = new Menu();
     menu.scanner = new Scanner(System.in);
