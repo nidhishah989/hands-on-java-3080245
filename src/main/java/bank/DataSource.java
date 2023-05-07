@@ -32,38 +32,65 @@ public class DataSource {
   }
 
   // Get customer information by username
-  public static Customer getCustomer(String username){
-    Customer customerresult=null;
+  public static Customer getCustomer(String username) {
+    Customer customerresult = null;
 
-    //sql statement for database query
+    // sql statement for database query
     String sqlstm = "select * from Customers where username = ?";
-    // Use try- resource method to close connection and statement and quary to avoid leak-
+    // Use try- resource method to close connection and statement and quary to avoid
+    // leak-
     // https://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html
-    try(Connection conn = connect();
-        PreparedStatement stm=conn.prepareStatement(sqlstm)){ //preparestatement is used cause we have parameter to add- to avoid sql injection
-          stm.setString(1, username);
-          //execute preparestatemet with try resources method
-          try(ResultSet result=stm.executeQuery()){ //executeQuery will give one result object. ResultSet is object from java.sql
-            while(result.next()) {//pointer to row like cursor
-              customerresult = new Customer(
-                result.getInt("id"),
-                result.getString("name"),
-                result.getString("username"),
-                result.getString("password"),
-                result.getInt("account_id")
-              );
-            }
-          }
-    }
-    catch(SQLException e){
+    try (Connection conn = connect();
+        PreparedStatement stm = conn.prepareStatement(sqlstm)) { // preparestatement is used cause we have parameter to
+                                                                 // add- to avoid sql injection
+      stm.setString(1, username);
+      // execute preparestatemet with try resources method
+      try (ResultSet result = stm.executeQuery()) { // executeQuery will give one result object. ResultSet is object
+                                                    // from java.sql
+        while (result.next()) {// pointer to row like cursor
+          customerresult = new Customer(
+              result.getInt("id"),
+              result.getString("name"),
+              result.getString("username"),
+              result.getString("password"),
+              result.getInt("account_id"));
+        }
+      }
+    } catch (SQLException e) {
       e.printStackTrace();
     }
 
     return customerresult;
   }
 
+  // Get customer account information
+  public static Account getaccountinfo(int accountid) {
+
+    String sqlstm = "select * from Accounts where id=?";
+    Account accresult = null;
+
+    try (Connection conn = connect();
+        PreparedStatement stm = conn.prepareStatement(sqlstm);) {
+      stm.setInt(1, accountid);
+      try (ResultSet res = stm.executeQuery()) {
+        while (res.next()) {
+          accresult = new Account(
+              res.getInt("id"),
+              res.getString("type"),
+              res.getDouble("balance"));
+        }
+      }
+
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+    return accresult;
+  }
+
   public static void main(String[] args) {
-    Customer cust=getCustomer("ttoulchi5@ehow.com");
+    Customer cust = getCustomer("ttoulchi5@ehow.com");
     System.out.println(cust.getName());
+    Account custacc = getaccountinfo(cust.getAccountId());
+    System.out.println(custacc.getBalance());
   }
 }
